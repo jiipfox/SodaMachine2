@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="bottles_array">
+        <item>Coca-Cola 0.5l 3€</item>
+        <item>Coca-Cola 0.33l 2€</item>
+    </string-array>
+</resources>
