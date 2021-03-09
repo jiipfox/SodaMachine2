@@ -25,30 +25,43 @@ public class BottleDispenser {
     }
     
     public String addMoney(double amount) {
-        money += amount;
-        String ret = "Klink! Added " + amount + "€";
+        String ret = "";
+        if (amount > 0.0) {
+            money += amount;
+            ret = "Klink! Added " + amount + "€";
+        }
         return ret;
     }
     
     public String buyBottle(int bottle_index) {
+        String bottle_details;
+        String ret_val = "";
+        double price;
+        double customer_balance;
+        int bottles = bottlesArray.size();
+
+
+        System.out.println("Bottles = " + bottles + ", buy index = " + bottle_index);
+
         if (bottlesArray.isEmpty()){
             return "Bottle dispenser is empty!";
         }
 
-        double d1 = bottlesArray.get(bottle_index).getPrice(); // always take the get the latest
-        double d2 = money;
-        if (Double.compare(d1,d2) > 0){
+        price = bottlesArray.get(bottle_index).getPrice(); // always take the get the latest
+        customer_balance = money;
+        if (Double.compare(price,customer_balance) > 0){
             return "Add money first!";
         }
 
-        String bottle_buy = bottlesArray.get(bottle_index).getName();
-        double price = bottlesArray.get(bottle_index).getPrice();
+        bottle_details = bottlesArray.get(bottle_index).getName();
 
-        bottles -= 1;
+        //bottles = bottles - 1; // ???
         bottlesArray.remove(bottle_index);
         money -= price;
-        String ret = "KACHUNK! " + bottle_buy + " came out of the dispenser!";
-        return ret;
+        ret_val = "KACHUNK! " + bottle_details + " came out of the dispenser!";
+
+        System.out.println("Succesfull!");
+        return ret_val;
     }
     
     public String returnMoney() {

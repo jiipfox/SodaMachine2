@@ -43,6 +43,7 @@ public class MainActivity extends Activity {
         moneyDispley = findViewById(R.id.moneys);
         checkBox = findViewById(R.id.checkPlease);
         this.fillBottles();
+        context = MainActivity.this;
 
         moneySliders.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int progressChangedValue = 0;
@@ -64,8 +65,9 @@ public class MainActivity extends Activity {
                 String s = "Moneys sliders are in :" + inEuros;
                 System.out.println("MONEEEEEEY slidet = " + s);
             }
-        });
 
+
+        });
     }
 
     public void buyBottle(View v){
@@ -73,25 +75,47 @@ public class MainActivity extends Activity {
         int chosen_one = bottleSpinner.getSelectedItemPosition();
         System.out.println("chosen id = " + chosen_one);
 
-        ArrayList temp = dispenser.getBottles();
+        ArrayList bottleList = dispenser.getBottles();
 
-        // if we are picking the last one from the list or last one, index -1?
-        if (chosen_one == (temp.size()-1) && temp.size() > 1){
-            bottleSpinner.setSelection(chosen_one - 1);
-        }
-        else {
-            bottleSpinner.setSelection(chosen_one + 1);
-        }
+        System.out.println("Bottle count = " + bottleList.size());
 
-        // Small bug is that check is store eventhough the buy doesn't succeed, TODO!
-        if (checkBox.isChecked()){
-            saveFile(v, temp.get(chosen_one).toString());
-            someAdds = "\nReceipt printed!";
-        }
-        String text = dispenser.buyBottle(chosen_one);
-        text = text.concat(someAdds);
+        try {
+            // if we are picking the last one from the list or last one, index -1?
+            if (chosen_one == (bottleList.size()-1) && bottleList.size() > 1){
+                bottleSpinner.setSelection(chosen_one - 1);
+            }
+            else {
+                bottleSpinner.setSelection(chosen_one + 1);
+            }
 
-        textMain.setText(text);
+            // Small bug is that check is stored eventhough the buy doesn't succeed, TODO!
+            if (checkBox.isChecked()){
+                String temp = bottleList.get(chosen_one).toString();
+                System.out.println(v);
+
+                System.out.println("Save to file: " + temp);
+                System.out.println("Directory: " + context.getFilesDir());
+                try{
+                    OutputStreamWriter out = new OutputStreamWriter(context.openFileOutput("kuitti.txt",
+                            Context.MODE_PRIVATE));
+
+                    out.write(temp);
+                    out.close();
+                } catch (IOException e){
+                    System.out.println(e.toString());
+                }
+
+                someAdds = "\nReceipt printed!";
+            }
+            String text = dispenser.buyBottle(chosen_one);
+            text = text.concat(someAdds);
+
+            textMain.setText(text);
+
+        } catch (IndexOutOfBoundsException e){
+            System.out.println("Ups, something went wrong during buy operation!\n");
+        }
+        System.out.println("Bottle bought\n");
     }
 
     public void insertCoin(View v){
@@ -107,8 +131,9 @@ public class MainActivity extends Activity {
 
     public void fillBottles(){
         dispenser.addBottle("Pepsi-Cola", "CCC", 0.5, 2.0);
-        dispenser.addBottle("Coca-Cola", "CCC", 0.254, 1.5);
+        dispenser.addBottle("Coca-Cola", "CCC", 0.3, 1.5);
         dispenser.addBottle("Pepsi-Cola", "CCC", 0.3, 2.0);
+        dispenser.addBottle("JaksuFanta", "CCC", 0.3, 1.5);
 
         ArrayAdapter adapter = new ArrayAdapter(this,
                                                 android.R.layout.simple_spinner_item,
@@ -117,41 +142,6 @@ public class MainActivity extends Activity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         bottleSpinner.setAdapter(adapter);
-    }
-
-    public void loadFile(View v){
-        try{
-            InputStream ins = context.openFileInput("kuitti.txt");
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(ins));
-            String s = "";
-            StringBuilder sbuild = new StringBuilder(100);
-
-            while ((s = br.readLine()) != null){
-                sbuild.append(s);
-                System.out.println(s);
-                sbuild.append("\n");
-            }
-            //editText.setText(sbuild);
-            ins.close();
-            //text2.setText("File loaded.");
-        } catch (IOException e){
-            System.out.println(e.toString());
-        }
-    }
-
-    private void saveFile(View v, String s){
-        System.out.println("SVE FILE === " + s);
-        try{
-            OutputStreamWriter out = new OutputStreamWriter(context.openFileOutput("testi.txt",
-                    Context.MODE_PRIVATE));
-
-            out.write(s);
-            out.flush();
-            out.close();
-        } catch (IOException e){
-            System.out.println(e.toString());
-        }
     }
 
 }
